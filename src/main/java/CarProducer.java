@@ -1,6 +1,7 @@
 import java.util.List;
 
 public class CarProducer implements Runnable {
+    private final int CREATE_TIME = 1500;
     private final List<Car> carList;
 
     public CarProducer(List<Car> carList) {
@@ -21,9 +22,9 @@ public class CarProducer implements Runnable {
 
     private void createCar() throws InterruptedException {
         synchronized (carList) {
-            Thread.sleep(1500);
             carList.add(new Car());
-            carList.notifyAll();
+            carList.notify();
+            Thread.sleep(CREATE_TIME);
         }
     }
 }

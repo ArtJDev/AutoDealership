@@ -1,6 +1,7 @@
 import java.util.List;
 
 public class CarBuyer implements Runnable {
+    private final int BUY_TIME = 1000;
     private final List<Car> carList;
 
     public CarBuyer(List<Car> carList) {
@@ -12,7 +13,6 @@ public class CarBuyer implements Runnable {
         synchronized (carList) {
             while (true) {
                 buyCar();
-                carList.notifyAll();
             }
         }
     }
@@ -21,12 +21,13 @@ public class CarBuyer implements Runnable {
         synchronized (carList) {
             try {
                 System.out.println(Thread.currentThread().getName() + " зашел в автосалон");
-                Thread.sleep(1000);
+                Thread.sleep(BUY_TIME);
                 if (carList.isEmpty()) {
                     System.out.println("Машин нет");
-                    carList.wait(); //после возобновления потока покупатель пытается уехать в строке 32 и выходит ошибка
+                    carList.wait();
                 } else {
-                    carList.remove(0); //тут поток проснулся, а машин нет
+                    carList.notify();
+                    carList.remove(0);
                     System.out.println(Thread.currentThread().getName() + " уехал на новеньком авто");
                 }
             } catch (InterruptedException ex) {
@@ -35,5 +36,3 @@ public class CarBuyer implements Runnable {
         }
     }
 }
-//ToDo покупатель и производитель вовремя не уведомляют, что они завершили 1 цикл
-//после notify() нужно попробовать поставить задержку
